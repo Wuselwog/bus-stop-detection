@@ -6,14 +6,30 @@ This Project allows to detect locations in which people enter or exit a bus, bas
 ## Install Instructions
 - Clone this repository
 - Install Detectron2 (https://detectron2.readthedocs.io/en/latest/tutorials/install.html) and all requirements of it. This project was tested using Python 3.7, Pytorch 1.9 and Cuda version 1.1, so we recommend using the same or similar versions
+- Installation of ROS related packages
+
+```
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu \
+    $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' \
+    --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+sudo apt-get update
+sudo apt-get install -y ros-melodic-ros-base ros-melodic-rosbag \
+    python3-numpy python3-yaml ros-melodic-cv-bridge
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+python3 -m pip install opencv-python pycryptodomex gnupg rospkg piexif
+```
 
 ## Usage Instructions
 The project currently assumes that data from the bus is stored in ros bag files, as produced by the BusEdge system https://github.com/CanboYe/BusEdge.
 
 ### Extracting Images from a bag File
-The script [read_bag_stops.py](scripts/ExtractBagFile/read_bag_stops.py) allows to extract all images of a bag file or all ros bag files in a folder into a new folder, while filtering out images with a high velocity or at the bus depot location. For the detection, camera images from the right-back camera are needed (id 5). So in order to extract these images, open a terminal in the [scripts/ExtractBagFile](scripts/ExtractBagFile) folder and run:
+The script [read_bag_stops.py](scripts/ExtractBagFile/read_bag_stops.py) allows to extract all images of a bag file or all ros bag files in a folder into a new folder, while filtering out images with a high velocity or at the bus depot location. For the detection, camera images from the right-back camera are needed. So in order to extract these images, open a terminal in the [scripts/ExtractBagFile](scripts/ExtractBagFile) folder and run:
 
 `python3 read_bag_stops.py -f path_to_folder_with_bags -o path_output -g -c 5`.
+
+You can download rosbags from our data center under /Data/busedge. You can also download a sample rosbag from this [link](https://drive.google.com/drive/folders/1kO9c3BQtAWeBVQN8p3Yhq0NuJscrG5Uf?usp=sharing). Already extracted sample data is also available in this repository in the folder [SampleData](data/extracted_images/SampleData/), so this step can be skipped for a sample run.
 
 ### Running the Detector on the Images
 The script [BusStopUtilities.py](scripts/BusStopUtilities.py) allows to move the data through a pipeline of detecting bus stops, categorizing and visualizing them. By calling the script with different flags, different steps can be executed. Some flags are also needed to specify some paths that are needed for some of the processing steps. The paths that can be specified are:
@@ -36,7 +52,9 @@ To run the detection on all available data with the standard paths, overwriting 
 
 `python3 BusStopUtilities.py -O -d -e -a -c -x -C 5`
 
-The results can be found inthe folder results, if no other path has been specified. In the sample data, only one case for an unofficial bus stop exists and no bag file for the data is provided. If no changes have been performed for the repository, the output should have the following structure:
+The results can be found in the folder results, if no other path has been specified. In the sample data, only one case for an unofficial bus stop exists and no bag file for the data is provided. If no changes have been performed for the repository, the output should have the following structure:
+
+```
 \results
   \DetectedBusStops
     \SampleData
@@ -46,10 +64,14 @@ The results can be found inthe folder results, if no other path has been specifi
     \SampleData
       camera5_1627665686_867068122.jpg
     camera5_1627665686_867068122.jpg
-  \results.txt
+  results.txt
+```
+  
 The output in the terminal should look similar to [SampleOutput.txt](data/extracted_images/SampleData/SampleOutput.txt).
 
-Not all flags need to be set, so for example to run only the detection, run the following command instead:
+The results folder contains the detection images multiple times, sorted into folder for easier management. So while results/DetectedUnofficialBusStops contains all detections, the subfolders only contain the detections for each individual dataset that has been evaluated.
+
+Not all flags need to be set, so for example to run only the detection, but not the evaluation and classification, run the following command instead:
 
 `python3 BusStopUtilities.py -O -d`
 
@@ -62,7 +84,7 @@ Another approach is to have a subscriber listen to ros topics of the data. The d
 `python3 BusstopDetectionSubscriber.py`
 
 ### Visualizing the Detection Locations
-The location of the detected stops can be visualized using AgileMapper https://app.agilemapper.com/maps. For this, create a new, free account and create a new map. Take all detections you want to have on the map, e.g. all images in the results/UnofficialBusStops folder and upload them to the map. When the upload is finished, they will be shown on the map, according to their GPS location.
+The location of the detected stops can be visualized using AgileMapper https://app.agilemapper.com/maps. For this, create a new, free account and create a new map. Take all detections you want to have on the map, e.g. all images in the results/DetectedUnofficialBusStops folder and upload them to the map. When the upload is finished, they will be shown on the map, according to their GPS location. Note that the upload might take a while and the map will not show the images before.
 
 ![Alt text](images/MapStops.png?raw=true "Detections visualized on AgileMapper")
 
