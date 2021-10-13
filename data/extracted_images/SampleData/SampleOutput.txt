@@ -1,0 +1,33 @@
+python3 BusStopUtilities.py -O -d -e -a -c -x -C 5
+Failed to load Python extension for LZ4 support. LZ4 compression will not be available.
+Detecting bus stops... this might take a while
+The checkpoint state_dict contains keys that are not used by the model:
+  proposal_generator.anchor_generator.cell_anchors.{0, 1, 2, 3, 4}
+/home/philip/anaconda3/envs/busedge/lib/python3.7/site-packages/torch/_tensor.py:575: UserWarning: floor_divide is deprecated, and will be removed in a future version of pytorch. It currently rounds toward 0 (like the 'trunc' function NOT 'floor'). This results in incorrect rounding for negative values.
+To keep the current behavior, use torch.div(a, b, rounding_mode='trunc'), or for actual floor division, use torch.div(a, b, rounding_mode='floor'). (Triggered internally at  /opt/conda/conda-bld/pytorch_1623448265233/work/aten/src/ATen/native/BinaryOps.cpp:467.)
+  return torch.floor_divide(self, other)
+/home/philip/anaconda3/envs/busedge/lib/python3.7/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /opt/conda/conda-bld/pytorch_1623448265233/work/c10/core/TensorImpl.h:1156.)
+  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
++1 entered -  0  img  ../data/extracted_images/SampleData/cam5/camera5_1627665686_867068122.jpg
+Entered:  1
+Left:  0
+Unsure:  0
+Saving file  ../data/extracted_images/SampleData/cam5output.txt
+Evaluating the computed output with Ground Truth data...
+../data/extracted_images/SampleData/cam5/camera5_1627665686_867068122.jpg  vs  data/bus_data/bus_2021-07-30-12-55/cam5/camera5_1627665689_066162007.jpg
+True positives:  1
+False positives:  0
+False negatives:  0
+True negatives:  84
+True classifications:  1
+False classifications:  0
+Saving file  ../data/extracted_images/SampleData/cam5results.txt
+Accumulating results...
+Finished Accumulating results!
+Categorizing all detected bus stops in the output into whether they are near an existing busstop or not...
+Stop: ../data/extracted_images/SampleData/cam5/camera5_1627665686_867068122.jpg
+243.3699874043297  -  ../data/extracted_images/SampleData/cam5/camera5_1627665686_867068122.jpg  -  Washington High School (Hall Ave.)  -  [ 40.17136667 -80.25383333]  -  [40.1733033603669, -80.2528055337295]
+Storing images for all detected unofficial bus stops... this might take a while
+['stops.txt', 'extracted_images']
+Could not detect bags for SampleData
+imgs: [1627665686]

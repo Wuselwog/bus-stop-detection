@@ -1,0 +1,28 @@
+Detection Improvements:
+- Black out left image area, as it only shows the bus windows and reflections in it can confuse the detection algorithm
+- Check if the front mirror has been detected as a human using Intersection of Union and ignore these wrong detections
+
+- Tried to use histogram equalization to better detect humans in dark images, but the effect seemed to be marginal, so this ide has been discarded.
+
+Tracking improvements:
+- Reassign ids if a detection is near an old detection that hasn't been observed in the last few frames
+- Use Intersection over Union of bounding boxes for keeping track, instead of euclidean distance of the mid points
+
+Detection improvement ideas:
+- Track if humans are in front of the bus before they get detected by the back camera, as humans coming from in front of the bus can get missclassified
+- Use camera right-front to back for more information
+- Use a better human detection algorithm
+- Use a better tracking algorithm, e.g. one that takes appearance into account
+- Retrain human detection algorithm with the examples where it didn't work, e.g. because of bad lighting conditions
+
+Optimization possibilities:
+- cut off all of the bus that is in the image, as it contains no useful information but might lead to wrong detections
+- cut of the right side of the image as it only has marginal influence on the output of this detection algorithm - others might need this area, so can't be done if we share the same detector
+
+Evaluation Improvements:
+- handle the edge case that more than 1 human enters or exists the bus (or the detection returns this case)
+
+Agile Mapper:
+Groups of images can have a tag, but there is currently no API to automatically upload images and tag them, or tag multiple images at once.
+
+
