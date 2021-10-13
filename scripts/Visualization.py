@@ -12,10 +12,7 @@ def VisualizeData(dataset_dicts, metadata, predict=None, num_imgs=10, start=0, s
     else:
         selected_data = dataset_dicts[start:start + step * num_imgs:step]
     for d in selected_data:
-    # for d in random.sample(dataset_dicts, 3):   
         im = cv2.imread(d["file_name"])
-        # if metadata is None:
-            # metatdata = MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
         
         v = Visualizer(im[:, :, ::-1],
                        metadata=metadata, 

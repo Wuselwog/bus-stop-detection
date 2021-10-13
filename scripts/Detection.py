@@ -25,26 +25,6 @@ from Data import GetCocoClasses
 def GetPredictor():
     cfg = get_cfg()
 
-    #add_backbone_config(cfg)
-    #cfg.merge_from_file(args.config_file)
-    #cfg.merge_from_list(args.opts)
-    #cfg.freeze()
-    #default_setup(cfg, args)
-
-    # # add project-specific config (e.g., TensorMask) here if you're not running a model in detectron2's core library
-    # # model = "COCO-Detection/retinanet_R_50_FPN_3x.yaml"
-    # # model = "COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"
-    # model = "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
-    # # cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-    # cfg.merge_from_file(model_zoo.get_config_file(model))
-    # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.6  # set threshold for this model
-    # # Find a model from detectron2's model zoo. You can use the https://dl.fbaipublicfiles... url as well
-    # # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
-    # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(model)
-    # predictor = DefaultPredictor(cfg)
-    # # outputs = predictor(im)
-
-
     model = "COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"
     cfg.merge_from_file(model_zoo.get_config_file(model))
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.6  # set threshold for this model
@@ -77,25 +57,8 @@ def intersects_with_door(box):
     # Somebody who exited was at (64.35417175292969, 208.9422607421875)
     return IoU_door(box) >= 0.3
 
-# def update_people_count(humans_to_count, entering_people, leaving_people, unsure, atLeastSeenFor):
-#     for human in humans_to_count.values():
-#         if human["seenFor"] >= atLeastSeenFor - 1:
-# #             is_at_door = is_near_door(human[0])
-#             is_at_door = intersects_with_door(human["box"])
-#             # human was first detected near the door and last detected near the door
-#             if human["firstSeenNearDoor"] and is_at_door:
-#                 unsure += 1
-#             # human was first detected near the door
-#             elif human["firstSeenNearDoor"]:
-#                 leaving_people += 1
-#             # human was last detected near the door
-#             elif is_at_door:
-#                 entering_people += 1
-#     return entering_people, leaving_people, unsure
-
 # TODO: update data file for this frame
 def update_people_count(humans_to_count, data, atLeastSeenFor, img_name):
-#     for human in humans_to_count.values():
     actionFlag = False
     for idx in humans_to_count:
         human = humans_to_count[idx]
@@ -109,30 +72,11 @@ def update_people_count(humans_to_count, data, atLeastSeenFor, img_name):
                     data["Entered"] += 1
                     print("+1 entered - ", idx, " img ", img_name)
                     data[img_name]["Entered"] = data[img_name].get("Entered", 1)
-#                     if "Entered" not in data[img_name]:
-#                         data[img_name]["Entered"] = 1
-#                     else:
-#                         data[img_name]["Entered"] += 1
                 else:
-#                     print("Sb left")
                     data["Left"] += 1
                     print("+1 left - ", idx, " img ", img_name)
                     data[img_name]["Left"] = data[img_name].get("Left", 1)
-#                     if "Left" not in data[img_name]:
-#                         data[img_name]["Left"] = 1
-#                     else:
-#                         data[img_name]["Left"] += 1
                 human["wasCounted"] = img_name
-                    
-#             # human was first detected near the door and last detected near the door
-#             if human["firstSeenNearDoor"] and is_at_door:
-#                 unsure += 1
-#             # human was first detected near the door
-#             elif human["firstSeenNearDoor"]:
-#                 leaving_people += 1
-#             # human was last detected near the door
-#             elif is_at_door:
-#                 entering_people += 1
     return data, actionFlag
 
 def final_update_people_count(humans_to_count, data, atLeastSeenFor, img_name):
@@ -146,18 +90,12 @@ def final_update_people_count(humans_to_count, data, atLeastSeenFor, img_name):
             if img_name not in data:
                 data[img_name] = {}
             data[img_name]["Unsure"] = data[img_name].get("Unsure", 1)
-#             if "Unsure" not in data[img_name]:
-#                 data[img_name]["Unsure"] = 1
-#             else:
-#                 data[img_name]["Unsure"] += 1
             human["wasCounted"] = img_name
         # human was counted as leaving, but in the end he was seen again near the door. This is often the case for people coming from in front of the bus
         # as it is hard to decide these cases, we note them as Unsure, e.g. so that a human could decide them
         elif human["wasCounted"] and human["firstSeenNearDoor"] and intersects_with_door(human["box"]):
-#             print(data[human["wasCounted"]]["Left"])
             data[human["wasCounted"]]["Left"] -= 1
             data[human["wasCounted"]]["Unsure"] = data[human["wasCounted"]].get("Unsure", 1)
-#             print(data[human["wasCounted"]]["Unsure"])
             print("+1 unsure -1 Left - ", idx, " img ", img_name)
             data["Left"] -= 1
             data["Unsure"] += 1
@@ -165,11 +103,6 @@ def final_update_people_count(humans_to_count, data, atLeastSeenFor, img_name):
     return data, actionFlag
 
 def ViewImg(img_name, im, humans, old_humans, view, metadata):
-    # if metadata is None:
-        # metatdata = MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
-# metadata = MetadataCatalog.get("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
-        # metadata = MetadataCatalog.get(model)
-        
     v = Visualizer(im[:, :, ::-1],
                    metadata=metadata, 
                    scale=0.5, 
@@ -181,11 +114,8 @@ def ViewImg(img_name, im, humans, old_humans, view, metadata):
     axe = plt.gca()
     axe.set_title(img_name)
     
-#     if len(humans) > 0:
     out = v.draw_instance_predictions(humans.to("cpu"))
     plt.imshow(out.get_image()[:, :, ::1])
-#     else:
-#         plt.imshow(im)
 
     # draw in the check area for the door
     # 50 < position[0] < 80 and 190 < position[1] < 230
@@ -204,6 +134,7 @@ def ViewImg(img_name, im, humans, old_humans, view, metadata):
     # rect = Rectangle((r_x, r_y), r_w, r_h, linewidth=10, edgecolor='r', facecolor='none')
     # axe.add_patch(rect)
 
+    # draw the boxes where the humans were tracked in the last frame
     # old_boxes = [x["box"] for x in self.old_humans.values()]
     # for b in old_boxes:
     #     rect = Rectangle((b[0] * 635 / 1280, b[1] * 355 / 720), (b[2] - b[0]) * 635 / 1280, (b[3] - b[1]) * 355 / 720, linewidth=10, edgecolor='r', facecolor='none')
@@ -211,16 +142,13 @@ def ViewImg(img_name, im, humans, old_humans, view, metadata):
 
     # Add the patch to the Axes
 #         bbox = plt.gca().get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-#         print("gca ", bbox.width * fig.dpi)
 
-#             if view == "humans":
     if view == "near":
         print("img: ", img_name)
 
 
 class Tracker:
     def Init(self):
-        # entering_people = leaving_people = unsure = 0
         self.tracked_humans = {}
         self.old_ids = []
         self.instance_count = -1
@@ -253,31 +181,7 @@ class Tracker:
         
 
     def TrackData(self, img_name, im, metadata, predictor=None, view="humans", slideshow=False, deleteAfter=1, tracking_overlap_threshold=0.0, atLeastSeenFor=1):
-    #     entering_people = leaving_people = unsure = 0
-    #     tracked_humans = {}
-    # #     human_poses = []
-    #     self.old_ids = []
-    #     instance_count = -1
-    #     self.class_names = GetCocoClasses()
-        
-    #     data = {}
-    #     if "Entered" not in data:
-    #         data["Entered"] = 0
-    #     if "Left" not in data:
-    #         data["Left"] = 0
-    #     if "Unsure" not in data:
-    #         data["Unsure"] = 0
-        
-        # if sample_random:
-        #     selected_data = random.sample(dataset_dicts, num_imgs)
-        # else:
-        #     selected_data = dataset_dicts[start:start + step * num_imgs:step]
-            
-        # for d in selected_data:
-        #     img_name = d["file_name"]
-
-        
-        # perform histogram equalization
+        # perform histogram equalization (seems to make no difference)
 #         img_yuv = cv2.cvtColor(im, cv2.COLOR_BGR2YUV)
 #         # equalize the histogram of the Y channel
 #         img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
@@ -379,9 +283,7 @@ class Tracker:
                             "box": np_boxes[j],
                             "wasCounted": False}
                 
-                # humans.set('pred_classes', torch.Tensor(new_ids))
                 self.humans.set('pred_classes', torch.as_tensor(np.array([int(new_id) for new_id in new_ids])))
-                # self.humans.set('scores', torch.Tensor([IoU_door(self.tracked_humans[str(i)]['box']) for i in new_ids]))
                 self.old_ids = new_ids
                 self.data, actionFlag = update_people_count(self.tracked_humans, self.data, atLeastSeenFor, img_name)
                 if view == "near" and actionFlag:
@@ -398,11 +300,11 @@ class Tracker:
                             "box": np_boxes[i],
                             "wasCounted": False}
                     self.old_ids.append(self.instance_count)
+                    
+                # Show the IoU with the door instead of the detection probability
                 # self.humans.set('scores', torch.Tensor([IoU_door(self.tracked_humans[str(self.old_ids[i])]['box']) for i in range(len(self.humans))]))
-                # self.humans.set('pred_classes', torch.Tensor([self.old_ids[i] for i in range(len(self.humans))]))
 
                 ids = torch.as_tensor(np.array([self.old_ids[i] for i in range(len(self.humans))]))
-                # print(ids, " of type ", type(ids))
                 self.humans.set('pred_classes', ids)
         
         if view == "all" or view == "humans" and len(self.tracked_humans) > 0:
