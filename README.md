@@ -1,5 +1,5 @@
 # BusStopDetection
-This Project allows to detect locations in which people enter or exit a bus, based on camera footage of the bus. The detected locations can then be compared to the location of the officially registered stops by the bus stop company. The detected stops then get devided into "official" and "unofficial" stops, based on if the detected stop location is closer than 100m to the nearest listed bus stop. An image for each detection is stored and can be uploaded e.g. to AgileMapper https://app.agilemapper.com/maps for visualization. 
+This Project allows to detect locations in which people enter or exit a bus, based on camera footage of the bus. The detected locations can then be compared to the location of the officially registered stops by the bus stop company. The detected stops then get devided into "official" and "unofficial" stops, based on if the detected stop location is closer than 100m to the nearest listed bus stop. An image for each detection is stored and can be uploaded e.g. to AgileMapper https://app.agilemapper.com/maps for visualization. Additional information and sample images can be found in our [slides](PresentationSlides.pdf).
 
 ![Alt text](images/Detection.png?raw=true "Humans detected in Bus Camera Footage")
 
